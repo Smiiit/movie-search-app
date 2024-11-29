@@ -1,24 +1,45 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import {
+  ThemeProvider,
+  createTheme,
+  CssBaseline,
+  Typography,
+} from "@mui/material";
+import MovieSearch from "./MovieSearch";
+import Favorites from "./Favorites";
+
+const theme = createTheme({
+  palette: {
+    mode: "dark",
+  },
+});
 
 function App() {
+  const [favoriteMovies, setFavoriteMovies] = useState([]);
+
+  useEffect(() => {
+    // Load favorite movies from session storage when the app starts
+    const storedFavorites = sessionStorage.getItem("favorites");
+    if (storedFavorites) {
+      setFavoriteMovies(JSON.parse(storedFavorites));
+    }
+  }, []);
+
+  const addFavorite = (movie) => {
+    const updatedFavorites = [...favoriteMovies, movie];
+    setFavoriteMovies(updatedFavorites);
+    sessionStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={theme}>
+      <Typography color="info" variant="h2" style={{ margin: "20px" }}>
+        Search Movies Here !
+      </Typography>
+      <CssBaseline />
+      <MovieSearch addFavorite={addFavorite} />
+      <Favorites favoriteMovies={favoriteMovies} />
+    </ThemeProvider>
   );
 }
 
